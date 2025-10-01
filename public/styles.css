@@ -1,0 +1,140 @@
+/* === Importação de Fonte e Estilos Gerais === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+    --cor-principal: #2c3e50;
+    --cor-destaque: #f39c12;
+    --cor-fundo: #f4f7f6;
+    --cor-texto: #333;
+    --cor-borda: #ccc;
+    --cor-sucesso: #2ecc71;
+    --cor-erro: #e74c3c;
+    --sombra-caixa: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 100vh;
+    padding: 20px;
+}
+
+/* === Container do Formulário === */
+.form-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: var(--sombra-caixa);
+    width: 100%;
+    max-width: 450px;
+}
+
+.form-container h2 {
+    text-align: center;
+    color: var(--cor-principal);
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* === Grupos de Formulário e Rótulos === */
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* === Campos de Input === */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--cor-destaque);
+    box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+}
+
+/* === Validação Visual dos Inputs === */
+.form-group.success input {
+    border-color: var(--cor-sucesso);
+}
+
+.form-group.error input {
+    border-color: var(--cor-erro);
+}
+
+/* === Container da Senha (para o ícone) === */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container i {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* === Medidor de Força da Senha === */
+#password-strength {
+    height: 5px;
+    width: 100%;
+    background-color: #eee;
+    margin-top: 8px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#password-strength div {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-weak { background-color: var(--cor-erro); width: 25%; }
+.strength-medium { background-color: #f1c40f; width: 50%; }
+.strength-good { background-color: #27ae60; width: 75%; }
+.strength-strong { background-color: var(--cor-sucesso); width: 100%; }
+
+/* === Botão de Cadastro === */
+button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--cor-principal);
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #34495e; /* Um tom mais claro do principal */
+}
+
+/* ===
