@@ -25,42 +25,39 @@ document.addEventListener('DOMContentLoaded', () => {
         togglePasswordVisibility(passwordInput, document.getElementById('togglePasswordIcon'));
     });
 
-    document.getElementById('toggleConfirmPasswordIcon').addEventListener('click', () => {
-        togglePasswordVisibility(confirmPasswordInput, document.getElementById('toggleConfirmPasswordIcon'));
-    });
+    // Só adiciona o listener se o campo de confirmação existir
+    if (document.getElementById('toggleConfirmPasswordIcon') && confirmPasswordInput) {
+        document.getElementById('toggleConfirmPasswordIcon').addEventListener('click', () => {
+            togglePasswordVisibility(confirmPasswordInput, document.getElementById('toggleConfirmPasswordIcon'));
+        });
+    }
 
     // Função para verificar a força da senha
     passwordInput.addEventListener('input', () => {
         const password = passwordInput.value;
         let score = 0;
-        
         if (password.length >= 8) score++;
         if (/[A-Z]/.test(password)) score++;
         if (/[a-z]/.test(password)) score++;
         if (/[0-9]/.test(password)) score++;
         if (/[^A-Za-z0-9]/.test(password)) score++;
 
-        const strengthBar = passwordStrengthDiv.querySelector('div') || document.createElement('div');
-        passwordStrengthDiv.innerHTML = '';
-        passwordStrengthDiv.appendChild(strengthBar);
-
+        let className = '';
+        let width = '0';
         switch (score) {
             case 1:
             case 2:
-                strengthBar.className = 'strength-weak';
-                break;
+                className = 'strength-weak'; width = '25%'; break;
             case 3:
-                strengthBar.className = 'strength-medium';
-                break;
+                className = 'strength-medium'; width = '50%'; break;
             case 4:
-                strengthBar.className = 'strength-good';
-                break;
+                className = 'strength-good'; width = '75%'; break;
             case 5:
-                strengthBar.className = 'strength-strong';
-                break;
+                className = 'strength-strong'; width = '100%'; break;
             default:
-                strengthBar.className = '';
+                className = ''; width = '0';
         }
+        passwordStrengthDiv.innerHTML = `<div class="${className}" style="width:${width}"></div>`;
     });
 
     // Função para mostrar erro
@@ -68,8 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formGroup = input.parentElement.closest('.form-group');
         formGroup.classList.remove('success');
         formGroup.classList.add('error');
-        messageDiv.textContent = message;
-        messageDiv.className = 'error';
+        showTempMessage(message, 'error');
     };
 
     // Função para mostrar sucesso
@@ -78,6 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
         formGroup.classList.remove('error');
         formGroup.classList.add('success');
     };
+
+    // Função para mostrar mensagem temporária
+    function showTempMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = type;
+        setTimeout(() => {
+            messageDiv.textContent = '';
+            messageDiv.className = '';
+        }, 2500);
+    }
     
     // Função para validar email
     const isValidEmail = (email) => {
@@ -91,7 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.textContent = '';
         
         let isValid = true;
-        const inputs = [nameInput, emailInput, confirmEmailInput, passwordInput, confirmPasswordInput];
+        // Só adiciona inputs que existem no HTML
+        const inputs = [nameInput, emailInput, passwordInput]
+            .concat(confirmEmailInput ? [confirmEmailInput] : [])
+            .concat(confirmPasswordInput ? [confirmPasswordInput] : []);
         
         // Resetar estilos
         inputs.forEach(input => {
@@ -119,11 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 3. Confirmar Email
-        if (emailInput.value !== confirmEmailInput.value) {
-            showError(confirmEmailInput, 'Os e-mails não coincidem.');
-            isValid = false;
-        } else {
-             if(isValidEmail(emailInput.value)) showSuccess(confirmEmailInput);
+        if (confirmEmailInput) {
+            if (emailInput.value !== confirmEmailInput.value) {
+                showError(confirmEmailInput, 'Os e-mails não coincidem.');
+                isValid = false;
+            } else {
+                if(isValidEmail(emailInput.value)) showSuccess(confirmEmailInput);
+            }
         }
 
         // 4. Validar senha (mínimo 8 caracteres)
@@ -135,11 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 5. Confirmar Senha
-        if (passwordInput.value !== confirmPasswordInput.value) {
-            showError(confirmPasswordInput, 'As senhas não coincidem.');
-            isValid = false;
-        } else {
-            if(passwordInput.value.length >= 8) showSuccess(confirmPasswordInput);
+        if (confirmPasswordInput) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showError(confirmPasswordInput, 'As senhas não coincidem.');
+                isValid = false;
+            } else {
+                if(passwordInput.value.length >= 8) showSuccess(confirmPasswordInput);
+            }
         }
 
         if (isValid) {
@@ -160,8 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(async response => {
                 const data = await response.json();
                 if (response.ok) {
-                    messageDiv.textContent = data.message || 'Cadastro realizado com sucesso!';
-                    messageDiv.className = 'success';
+                    showTempMessage(data.message || 'Cadastro realizado com sucesso!', 'success');
                     form.reset();
                     passwordStrengthDiv.innerHTML = '';
                 } else {
@@ -169,8 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
             .catch(error => {
-                messageDiv.textContent = error.message;
-                messageDiv.className = 'error';
+                showTempMessage(error.message, 'error');
             });
         }
     });

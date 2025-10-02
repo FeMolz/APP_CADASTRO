@@ -22,10 +22,10 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--cor-fundo);
     color: var(--cor-texto);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    max-height: 100vh;
     padding: 20px;
 }
 
@@ -84,6 +84,19 @@ body {
     border-color: var(--cor-erro);
 }
 
+/* === Container Email e Nome (para o ícone) === */
+.icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.icon-container i {
+    position: absolute;
+    right: 15px;
+    color: #999;
+}
+
 /* === Container da Senha (para o ícone) === */
 .password-container {
     position: relative;
@@ -111,7 +124,7 @@ body {
 #password-strength div {
     height: 100%;
     width: 0;
-    transition: width 0.3s ease, background-color 0.3s ease;
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
 }
 
 .strength-weak { background-color: var(--cor-erro); width: 25%; }
