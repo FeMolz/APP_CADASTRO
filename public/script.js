@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Verificar campos vazios
         inputs.forEach(input => {
             if (input.value.trim() === '') {
-                showError(input, 'Todos os campos são obrigatórios.');
+                showError(input, 'Todos os campos são obrigatórios');
                 isValid = false;
             } else {
                 showSuccess(input);
