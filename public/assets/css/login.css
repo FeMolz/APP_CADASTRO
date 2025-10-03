@@ -1,0 +1,176 @@
+/* === Importação de Fonte e Estilos Gerais === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+    --cor-principal: #2c3e50;
+    --cor-destaque: #f39c12;
+    --cor-fundo: #f4f7f6;
+    --cor-texto: #333;
+    --cor-borda: #ccc;
+    --cor-sucesso: #2ecc71;
+    --cor-erro: #e74c3c;
+    --sombra-caixa: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* === Container do Formulário === */
+.form-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: var(--sombra-caixa);
+    width: 100%;
+    max-width: 450px;
+}
+
+.form-container h2 {
+    text-align: center;
+    color: var(--cor-principal);
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* === Grupos de Formulário e Rótulos === */
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* === Campos de Input === */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--cor-destaque);
+    box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+}
+
+.form-group .input-error {
+    border-color: var(--cor-erro); /* Usa a variável de cor de erro que já definimos */
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); /* Adiciona um brilho vermelho sutil */
+}
+
+/* === Container da Senha (para o ícone) === */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Garante espaço para o ícone de olho dentro do input de senha */
+.password-container input {
+    padding-right: 45px;
+}
+
+.password-container i {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    color: #999;
+    font-size: 1.2rem;
+}
+
+/* === Botão de Login === */
+button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--cor-principal);
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins';
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: #34495e; /* Um tom mais claro do principal */
+    transform: translateY(-2px);
+}
+
+/* === Container Email (para o ícone) */
+
+.icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.icon-container i {
+    position: absolute;
+    right: 15px;
+    color: #999;
+}
+
+/* === Link para a tela de Cadastro === */
+.redirect-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.redirect-link a {
+    color: var(--cor-principal);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.redirect-link a:hover {
+    text-decoration: underline;
+}
+
+/* === Mensagens de Sucesso ou Erro === */
+#message {
+    margin-top: 18px;
+    text-align: center;
+    min-height: 24px;
+    font-size: 0.95rem;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+#message.success {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border-color: rgba(46, 204, 113, 0.3);
+}
+
+#message.error {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--cor-erro);
+    border-color: rgba(231, 76, 60, 0.3);
+}

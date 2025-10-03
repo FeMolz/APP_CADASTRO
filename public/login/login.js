@@ -17,45 +17,86 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     form.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    event.preventDefault();
 
-        const email = document.getElementById('email').value;
-        const password = passwordInput.value;
+    // 1. Selecionar os elementos dos inputs, não apenas os valores
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
 
-        if (!email || !password) {
-            showMessage('Por favor, preencha todos os campos.', 'error');
-            return;
+    // Pegar os valores
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    
+    // 2. Limpar bordas de erro de tentativas anteriores
+    emailInput.classList.remove('input-error');
+    passwordInput.classList.remove('input-error');
+    showMessage('', '');
+
+    // Validação de campos vazios
+    if (!email || !password) {
+        showMessage('Por favor, preencha todos os campos.', 'error');
+        
+        // 3. ADICIONADO: Aplica a classe de erro nas bordas
+        emailInput.classList.add('input-error');
+        passwordInput.classList.add('input-error');
+        
+        setTimeout(() => {
+            showMessage('', '');
+            // 4. ADICIONADO: Remove a classe de erro das bordas
+            emailInput.classList.remove('input-error');
+            passwordInput.classList.remove('input-error');
+        }, 3000);
+
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showMessage('Login realizado com sucesso! Redirecionando...', 'success');
+            localStorage.setItem('token', data.token);
+            setTimeout(() => {
+                window.location.href = '/dashboard/';
+            }, 1500);
+        } else {
+            // Erro vindo da API (ex: senha incorreta)
+            showMessage(data.message, 'error');
+            
+            // 3. ADICIONADO: Aplica a classe de erro nas bordas
+            emailInput.classList.add('input-error');
+            passwordInput.classList.add('input-error');
+
+            setTimeout(() => {
+                showMessage('', '');
+                // 4. ADICIONADO: Remove a classe de erro das bordas
+                emailInput.classList.remove('input-error');
+                passwordInput.classList.remove('input-error');
+            }, 3000);
         }
 
-        try {
-            const response = await fetch('http://localhost:3000/api/users/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+    } catch (error) {
+        // Erro de conexão com o servidor
+        showMessage('Falha na comunicação com o servidor.', 'error');
+        
+        // 3. ADICIONADO: Aplica a classe de erro nas bordas
+        emailInput.classList.add('input-error');
+        passwordInput.classList.add('input-error');
 
-            const data = await response.json();
-
-            if (response.ok) {
-                // SUCESSO! O token foi recebido.
-                showMessage('Login realizado com sucesso! Redirecionando...', 'success');
-
-                // 1. Salvar o token no localStorage do navegador
-                localStorage.setItem('token', data.token);
-
-                // 2. Redirecionar para uma página protegida (ex: dashboard) após um breve momento
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-
-            } else {
-                throw new Error(data.message);
-            }
-
-        } catch (error) {
-            showMessage(error.message, 'error');
-        }
-    });
+        setTimeout(() => {
+            showMessage('', '');
+            // 4. ADICIONADO: Remove a classe de erro das bordas
+            emailInput.classList.remove('input-error');
+            passwordInput.classList.remove('input-error');
+        }, 3000);
+    }
+});
 
     function showMessage(message, type) {
         messageDiv.textContent = message;

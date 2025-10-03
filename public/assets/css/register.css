@@ -144,21 +144,32 @@ button[type="submit"] {
     font-weight: 600;
     font-family: 'Poppins';
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 button[type="submit"]:hover {
     background-color: #34495e; /* Um tom mais claro do principal */
+    transform: translateY(-2px);
 }
 
-/* === Ir tela Login === */
+/* === Link para tela de Login === */
 .possui-conta {
-    display: flex;
-    justify-content: center;
+    text-align: center;
     margin-top: 20px;
+    font-size: 0.9rem;
 }
 
-/* === Mensagem sucesso ou fracasso === */
+.possui-conta a {
+    color: var(--cor-principal);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.possui-conta a:hover {
+    text-decoration: underline;
+}
+
+/* === Mensagem Sucesso ou Fracasso === */
 #message {
     margin-top: 18px;
     text-align: center;
