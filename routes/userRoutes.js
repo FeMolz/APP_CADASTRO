@@ -35,9 +35,22 @@ router.post('/register', async (req, res) => {
     // 5. Salvar o usuário no banco de dados
     const newUser = await user.save();
 
+    // === Geração de token imediatamente após o cadastro 
+    const payload = {
+            id: newUser._id,
+            name: newUser.name,
+        };
+
+        const token = jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
     // 6. Enviar a resposta de sucesso (sem a senha)
     res.status(201).json({
       message: 'Usuário criado com sucesso!',
+      token: token,
       user: {
         id: newUser._id,
         name: newUser.name,

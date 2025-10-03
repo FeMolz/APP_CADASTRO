@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const togglePasswordVisibility = (input, icon) => {
         if (input.type === 'password') {
             input.type = 'text';
-            icon.classList.remove('bi-eye-slash-fill');
+            icon.classList.remove('bi-eye-slash-fill'); 
             icon.classList.add('bi-eye-fill');
         } else {
             input.type = 'password';
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Validação do formulário no envio
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         messageDiv.textContent = '';
         
@@ -165,34 +165,52 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (isValid) {
-            // Enviar dados para o servidor
-            const userData = {
-                name: nameInput.value.trim(),
-                email: emailInput.value.trim(),
-                password: passwordInput.value
-            };
+if (isValid) {
+    // Mas para simplificar, vamos focar neste bloco.
 
-            fetch('http://localhost:3000/api/users/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            })
-            .then(async response => {
-                const data = await response.json();
-                if (response.ok) {
-                    showTempMessage(data.message || 'Cadastro realizado com sucesso!', 'success');
-                    form.reset();
-                    passwordStrengthDiv.innerHTML = '';
-                } else {
-                    throw new Error(data.message || 'Erro ao cadastrar.');
-                }
-            })
-            .catch(error => {   
-                showTempMessage(error.message, 'error');
-            });
+    const userData = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        password: passwordInput.value
+    };
+
+    try {
+        const response = await fetch('http://localhost:3000/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // lança um erro que será pego pelo bloco 'catch' abaixo.
+            throw new Error(data.message || 'Ocorreu um erro no servidor.');
         }
+
+        // 1. Mostra a mensagem de sucesso
+        showTempMessage('Cadastro realizado com sucesso! Redirecionando...', 'success');
+
+        // 2. Salva o token recebido no localStorage do navegador
+        localStorage.setItem('token', data.token);
+
+        // 3. Reseta o formulário e a barra de força da senha
+        form.reset();
+        if (passwordStrengthDiv) passwordStrengthDiv.innerHTML = '';
+
+        // 4. Redireciona para o dashboard após 1.5 segundos
+        setTimeout(() => {
+            window.location.href = '/dashboard/';
+        }, 1500);
+
+    } catch (error) {
+        // Pega qualquer erro (seja de conexão ou da API) e exibe a mensagem
+        showTempMessage(error.message, 'error');
+        // Opcional: Adiciona a borda vermelha em todos os campos em caso de erro do servidor
+        inputs.forEach(input => {
+            input.parentElement.closest('.form-group').classList.add('error');
+        });
+    }
+}
     });
 });
