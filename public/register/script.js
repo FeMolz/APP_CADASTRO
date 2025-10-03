@@ -76,14 +76,24 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Função para mostrar mensagem temporária
-    function showTempMessage(message, type) {
-        messageDiv.textContent = message;
-        messageDiv.className = type;
-        setTimeout(() => {
+    function showTempMessage(message, type) {
+        messageDiv.textContent = message;
+        // Adiciona a classe de mensagem (ex: 'error' ou 'success' no #message)
+        messageDiv.className = type; 
+
+        setTimeout(() => {
+            // Limpa a mensagem de texto
             messageDiv.textContent = '';
-            messageDiv.className = '';
-        }, 2500);
-    }
+            messageDiv.className = '';
+            
+            // ADICIONADO: Limpa as classes de erro/sucesso de TODOS os campos
+            const allFormGroups = form.querySelectorAll('.form-group');
+            allFormGroups.forEach(group => {
+                group.classList.remove('error', 'success');
+            });
+
+        }, 2500); // O temporizador de 2.5 segundos que você já tinha
+    }
     
     // Função para validar email
     const isValidEmail = (email) => {
@@ -180,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(data.message || 'Erro ao cadastrar.');
                 }
             })
-            .catch(error => {
+            .catch(error => {   
                 showTempMessage(error.message, 'error');
             });
         }

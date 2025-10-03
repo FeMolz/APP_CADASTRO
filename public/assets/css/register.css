@@ -82,6 +82,7 @@ body {
 
 .form-group.error input {
     border-color: var(--cor-erro);
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
 }
 
 /* === Container Email e Nome (para o ícone) === */
