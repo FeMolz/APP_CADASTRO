@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const userRoutes = require('./routes/userRoutes');
 const cors = require('cors');
+const path = require('path');
 
 // Carrega as variáveis de ambiente do arquivo .env
 dotenv.config();
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware para permitir que o Express entenda JSON
 app.use(cors())
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexão com o Banco de Dados MongoDB
 mongoose.connect(process.env.MONGO_URI, {

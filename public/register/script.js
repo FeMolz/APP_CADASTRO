@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.className = type; 
 
         setTimeout(() => {
-            // Limpa a mensagem de texto
+            // Limpa a mensagem de texto
             messageDiv.textContent = '';
             messageDiv.className = '';
             
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 group.classList.remove('error', 'success');
             });
 
-        }, 2500); // O temporizador de 2.5 segundos que você já tinha
+        }, 2500); 
     }
     
     // Função para validar email
