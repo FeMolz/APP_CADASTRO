@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('token', data.token);
             setTimeout(() => {
                 window.location.href = '/dashboard/';
-            }, 1500);
+            }, 1000);
         } else {
             // Erro vindo da API (ex: senha incorreta)
             showMessage(data.message, 'error');
