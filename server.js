@@ -1,8 +1,9 @@
 // server.js
 const express = require('express');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
+const projectRoutes = require('./routes/projectRoutes');
 const cors = require('cors');
 const path = require('path');
 
@@ -27,6 +28,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Usar as rotas de usuário
 app.use('/api/users', userRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Rota principal
 app.get('/', (req, res) => {

@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        // Se já existe um token, o usuário já está logado.
+        // Redireciona para o dashboard e para a execução do script.
+        window.location.href = '/dashboard/';
+        return; 
+    }
     const form = document.getElementById('login-form');
     const messageDiv = document.getElementById('message');
     const passwordInput = document.getElementById('password');

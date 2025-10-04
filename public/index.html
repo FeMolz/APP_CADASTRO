@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Carregando...</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; text-align: center; padding-top: 100px; color: #555; }
+    </style>
+    <script>
+        // Este script executa imediatamente, antes mesmo da página ser totalmente visível.
+        (function() {
+            // Pega o token de autenticação do armazenamento local do navegador.
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                // Se o token existir, o usuário está logado.
+                // Redireciona para o dashboard.
+                window.location.href = '/dashboard/';
+            } else {
+                // Se não houver token, o usuário não está logado.
+                // Redireciona para a página de login.
+                window.location.href = '/login/';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecionando...</p>
+</body>
+</html>
