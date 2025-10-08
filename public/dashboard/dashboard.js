@@ -1,96 +1,112 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-
-    // Guarda de rota: Se não há token, redireciona para o login.
-    if (!token) {
-        window.location.href = '/login/';
-        return;
-    }
+    if (!token) { window.location.href = '/login/'; return; }
 
     // --- SELEÇÃO DE ELEMENTOS ---
-    const projectList = document.getElementById('project-list');
-    const newProjectForm = document.getElementById('new-project-form');
-    const newProjectNameInput = document.getElementById('new-project-name');
-    const logoutButton = document.getElementById('logout-button');
+    const createBtn = document.querySelector('.btn-create-container');
+    const toggleMenuBtn = document.querySelector('.toggle-menu-container');
+    const logoutIcon = document.querySelector('.config-icons-container .bi-person-circle');
+    
+    // Elementos para as tarefas
+    const modal = document.getElementById('task-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const taskForm = document.getElementById('task-form');
+    const taskListContainer = document.getElementById('task-list-container');
 
-    // --- FUNÇÕES ---
-
-    // Função para buscar e renderizar os projetos
-    const fetchAndRenderProjects = async () => {
-        try {
-            const response = await fetch('/api/projects', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                // Se o token for inválido/expirado, o servidor retornará um erro 401
-                if (response.status === 401) {
-                    localStorage.removeItem('token');
-                    window.location.href = '/login/';
-                }
-                throw new Error('Falha ao buscar projetos.');
-            }
-
-            const projects = await response.json();
-
-            // Limpa a lista atual
-            projectList.innerHTML = ''; 
-
-            // Adiciona cada projeto à lista na sidebar
-            projects.forEach(project => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `<a href="#" data-project-id="${project._id}"><i class="bi bi-folder"></i> ${project.name}</a>`;
-                projectList.appendChild(listItem);
-            });
-
-        } catch (error) {
-            console.error('Erro:', error);
+    // --- FUNÇÕES DE INTERFACE (UI) ---
+    const openModal = () => modal.classList.remove('hidden');
+    const closeModal = () => modal.classList.add('hidden');
+    const handleToggleMenu = () => document.body.classList.toggle('sidebar-collapsed');
+    const handleLogout = () => {
+        if (confirm('Tem certeza que deseja sair?')) {
+            localStorage.removeItem('token');
+            window.location.href = '/login/';
         }
     };
 
-    // Função para criar um novo projeto
-    const handleNewProjectSubmit = async (event) => {
-        event.preventDefault();
-        const projectName = newProjectNameInput.value.trim();
+    // --- FUNÇÕES DE TAREFAS ---
+    const fetchAndRenderTasks = async () => {
+        try {
+            const res = await fetch('/api/tasks', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) {
+                if (res.status === 401) { // Token expirado/inválido
+                    handleLogout();
+                }
+                throw new Error('Falha ao carregar tarefas');
+            }
+            const tasks = await res.json();
 
-        if (!projectName) return; // Não faz nada se o nome estiver vazio
+            taskListContainer.innerHTML = '';
+            if (tasks.length === 0) {
+                taskListContainer.innerHTML = '<p>Você ainda não tem tarefas. Clique em "Create" para adicionar uma!</p>';
+                return;
+            }
+
+            tasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                taskCard.setAttribute('data-id', task._id);
+                taskCard.innerHTML = `
+                    <h3>${task.title}</h3>
+                    <p>${task.description || ''}</p>
+                    ${task.imageUrl ? `<img src="${task.imageUrl}" alt="${task.title}">` : ''}
+                    <div class="task-card-actions">
+                        <button class="edit-btn" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                        <button class="delete-btn" title="Apagar"><i class="bi bi-trash3-fill"></i></button>
+                    </div>
+                `;
+                taskListContainer.appendChild(taskCard);
+            });
+        } catch (error) { console.error(error); }
+    };
+
+    const handleTaskFormSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(taskForm);
 
         try {
-            const response = await fetch('/api/projects', {
+            const res = await fetch('/api/tasks', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ name: projectName })
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
             });
+            if (!res.ok) throw new Error('Falha ao salvar a tarefa');
+            
+            closeModal();
+            taskForm.reset();
+            await fetchAndRenderTasks();
+        } catch (error) { console.error(error); }
+    };
 
-            if (!response.ok) throw new Error('Falha ao criar projeto.');
-
-            newProjectNameInput.value = ''; // Limpa o campo de input
-            await fetchAndRenderProjects(); // Atualiza a lista de projetos na tela
-
-        } catch (error) {
-            console.error('Erro:', error);
+    const handleTaskListClick = async (e) => {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+            const taskCard = deleteBtn.closest('.task-card');
+            const taskId = taskCard.dataset.id;
+            
+            if (confirm('Tem certeza que deseja apagar esta tarefa?')) {
+                try {
+                    const res = await fetch(`/api/tasks/${taskId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (!res.ok) throw new Error('Falha ao deletar a tarefa');
+                    await fetchAndRenderTasks();
+                } catch (error) { console.error(error); }
+            }
         }
+        // Lógica para editar pode ser adicionada aqui no futuro
     };
 
     // --- EVENT LISTENERS ---
-
-    // Listener para o formulário de novo projeto
-    newProjectForm.addEventListener('submit', handleNewProjectSubmit);
-
-    // Listener para o botão de logout
-    logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('token');
-
-        window.location.href = '/login/';
-    });
+    createBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    taskForm.addEventListener('submit', handleTaskFormSubmit);
+    taskListContainer.addEventListener('click', handleTaskListClick);
+    toggleMenuBtn.addEventListener('click', handleToggleMenu);
+    logoutIcon.addEventListener('click', handleLogout);
 
     // --- INICIALIZAÇÃO ---
-    // Busca os projetos assim que a página carrega
-    fetchAndRenderProjects();
+    fetchAndRenderTasks();
 });

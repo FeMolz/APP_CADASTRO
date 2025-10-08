@@ -1,54 +1,99 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Meu dashboard</title>
     <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <header class="sidebar-header">
-                <h3>Menu Principal</h3>
-            </header>
+    
+    <header>
+        <nav class="navbar">
+            <div class="toggle-menu-container">
+                <i class="bi bi-list"></i>
+            </div>
 
-            <nav class="sidebar-nav">
-                <button id="add-task-btn"><i class="bi bi-plus-lg"></i> Adicionar Tarefa</button>
+            <div class="input-search-container">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Pesquisar">
+            </div>
 
-                <ul class="nav-list">
-                    <li><a href="#"><i class="bi bi-inbox-fill"></i> Caixa de Entrada</a></li>
-                    <li><a href="#"><i class="bi bi-star-fill"></i> Hoje</a></li>
-                    <li><a href="#"><i class="bi bi-calendar-date"></i> Próximos 7 dias</a></li>
-                </ul>
+            <div class="btn-create-container">
+                <i class="bi bi-plus"></i>
+                <span>Create</span>
+            </div>
 
-                <div class="projects-section">
-                    <h4>Projetos</h4>
-                    <ul id="project-list">
-                        </ul>
-                    <form id="new-project-form">
-                        <input type="text" id="new-project-name" placeholder="Novo Projeto..." required />
-                        <button type="submit">+</button>
-                    </form>
+            <div class="config-icons-container">
+                <i class="bi bi-gear"></i>
+                <i class="bi bi-person-circle"></i>
+            </div>
+        </nav>
+    </header>
+
+    <aside>
+        <nav class="sidebar">
+            <h2>Meus Projetos</h2>
+            <ul>
+                <li class="itens-sidebar">
+                    <i class="bi bi-inbox"></i>
+                    <span>Inbox</span>
+                </li>
+
+                <li class="itens-sidebar">
+                    <i class="bi bi-bookmark"></i>
+                    <span>Today</span>
+                </li>
+
+                <li class="itens-sidebar">
+                    <i class="bi bi-star"></i>
+                    <span>Favorites</span>
+                </li>
+
+                <li class="itens-sidebar">
+                    <i class="bi bi-check2-circle"></i>
+                    <span>To do</span>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="main-content">
+            <h1 id="main-title">Inbox</h1>
+            <div id="task-list-container">
                 </div>
-            </nav>
+        </div>
+    </main>
 
-            <footer class="sidebar-footer">
-                <button id="logout-button"><i class="bi bi-box-arrow-right"></i> Sair</button>
-            </footer>
-        </aside>
-
-        <main class="main-content">
-            <header>
-                <h1>Caixa de Entrada</h1>
+    <div id="task-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="modal-title">Nova Tarefa</h2>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
             </header>
-            <section class="task-list-container">
-                <p>Nenhuma tarefa por enquanto.</p>
-            </section>
-        </main>
+            <form id="task-form">
+                <div class="form-group">
+                    <label for="task-title">Título</label>
+                    <input type="text" id="task-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Descrição</label>
+                    <textarea id="task-description" rows="4" name="description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-image">Imagem (Opcional)</label>
+                    <input type="file" id="task-image" name="image" accept="image/*">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="save-task-btn">Salvar Tarefa</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="dashboard.js"></script>
+    <script src="dashStyle.js"></script>
 </body>
 </html>
