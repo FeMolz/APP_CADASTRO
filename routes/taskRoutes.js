@@ -50,5 +50,42 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // Adicione aqui as rotas PUT (editar) no futuro
+router.put('/:id', auth, upload.single('image'), async (req, res) => {
+    const { title, description } = req.body;
+    const taskId = req.params.id;
+
+    try {
+        // Encontra a tarefa no banco de dados
+        let task = await Task.findById(taskId);
+
+        if (!task) {
+            return res.status(404).json({ msg: 'Tarefa não encontrada.' });
+        }
+
+        // Garante que o usuário só pode editar sua própria tarefa
+        if (task.user.toString() !== req.user.id) {
+            return res.status(401).json({ msg: 'Não autorizado.' });
+        }
+
+        // Monta o objeto com os campos atualizados
+        const updatedFields = {};
+        if (title) updatedFields.title = title;
+        if (description) updatedFields.description = description;
+        if (req.file) updatedFields.imageUrl = req.file.path; // Atualiza a imagem se uma nova for enviada
+
+        // Atualiza a tarefa no banco de dados
+        task = await Task.findByIdAndUpdate(
+            taskId,
+            { $set: updatedFields },
+            { new: true, runValidators: true } // 'new: true' retorna o documento atualizado
+        );
+
+        res.json(task); // Retorna a tarefa atualizada
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Erro no servidor');
+    }
+});
 
 module.exports = router;
