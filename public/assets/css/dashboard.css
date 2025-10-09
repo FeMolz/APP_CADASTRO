@@ -211,15 +211,6 @@ aside {
     background-color: #e0e0e0; 
 }
 
-/*  Main content styles */
-.main-content {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  padding: 30px; 
-}
-
-
 /* ESTILOS DO MODAL */
 .modal-overlay {
     position: fixed;
@@ -322,30 +313,99 @@ aside {
 
 #task-modal #save-task-btn:hover { background-color: #186ac9; }
 
-/* ESTILOS DOS CARDS DE TAREFA */
-#task-list {
+/* =================================== */
+/* === ESTILOS DA ÁREA DE CONTEÚDO === */
+/* =================================== */
+
+.main-content {
+    padding: 30px; 
+    background-color: #ffffff; /* Fundo branco para a área principal */
+    overflow-y: auto; /* Adiciona scroll se o conteúdo for maior que a tela */
+}
+
+/* --- Layout Principal das Tarefas (Lado a Lado) --- */
+#task-list-container {
     display: grid;
-    gap: 20px;
+    /* Layout responsivo em colunas */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px; /* Espaço entre os cards */
 }
 
+/* --- Estilo para a mensagem de "nenhuma tarefa" (CORRIGIDO) --- */
+#task-list-container p {
+    grid-column: 1 / -1;           /* Garante que ocupe toda a largura da grade */
+    text-align: justify;           /* Centraliza o texto */
+    padding: 20px 20px;            /* Mais espaçamento vertical para centralizar melhor */
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #000000;               /* Cor azul */
+    background-color: transparent; /* Sem fundo */
+}
+
+
+/* --- Estilo do Card de Tarefa (task-card) --- */
 .task-card {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     border: 1px solid #e9ecef;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra suave para os cards */
 }
 
-.task-card h3 { margin-bottom: 10px; }
-.task-card p { margin-bottom: 15px; color: #6c757d; }
-.task-card img { max-width: 100%; border-radius: 4px; margin-bottom: 15px; }
-.task-card-actions { text-align: right; }
+/* --- Conteúdo Dentro do Card --- */
+.task-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color:#007bff; /* Usando a cor principal para o título */
+    word-break: break-word;
+}
+
+.task-card p {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex-grow: 1; /* Empurra as ações para o final */
+    margin-bottom: 20px;
+    word-break: break-word;
+    
+}
+
+.task-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* --- Ações (Botões de Editar/Deletar) --- */
+.task-card-actions {
+    margin-top: auto;
+    text-align: right;
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+}
+
 .task-card-actions button {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
     margin-left: 15px;
+    transition: transform 0.2s;
 }
-.edit-btn { color: #007bff; }
-.delete-btn { color: #e74c3c; }
+
+.task-card-actions .edit-btn {
+    color: #007bff; /* Azul */
+}
+
+.task-card-actions .delete-btn {
+    color: #e74c3c; /* Vermelho */
+}
+
+.task-card-actions button:hover {
+    transform: scale(1.1);
+}

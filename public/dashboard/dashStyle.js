@@ -1,30 +1,57 @@
-// Espera o documento HTML ser completamente carregado para então executar o código
-document.addEventListener('DOMContentLoaded', function() {
+// public/dashboard/dashStyle.js
 
-    // 1. Seleciona todos os elementos que são itens clicáveis da sidebar
-    const sidebarItems = document.querySelectorAll('.itens-sidebar');
-    
-    // (Bônus) Seleciona o título principal que vamos atualizar
-    const mainTitle = document.getElementById('main-title');
+document.addEventListener('DOMContentLoaded', () => {
+    // --- SELEÇÃO DE ELEMENTOS PARA INTERAÇÃO VISUAL ---
+    const createBtn = document.querySelector('.btn-create-container');
+    const toggleMenuBtn = document.querySelector('.toggle-menu-container');
+    const modal = document.getElementById('task-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
 
-    // 2. Para cada item encontrado, adiciona um "ouvinte" de evento de clique
-    sidebarItems.forEach(item => {
-        item.addEventListener('click', function() {
-            
-            // 3. Quando um item é clicado, primeiro remove a classe 'active' de TODOS os itens
-            sidebarItems.forEach(innerItem => {
-                innerItem.classList.remove('active');
-            });
+    // --- FUNÇÕES DE CONTROLE DA INTERFACE (UI) ---
 
-            // 4. Depois, adiciona a classe 'active' APENAS no item que foi clicado
-            item.classList.add('active');
+    // Abre o modal
+    const openModal = () => {
+        if (modal) modal.classList.remove('hidden');
+    };
 
-            // 5. (Bônus) Atualiza o título da página com o texto do item clicado
-            // Procura pelo `span` dentro do item clicado e pega o texto dele
-            const newTitle = item.querySelector('span').textContent;
-            mainTitle.textContent = newTitle;
-            
+    // Fecha o modal
+    const closeModal = () => {
+        if (modal) modal.classList.add('hidden');
+    };
+
+    // Alterna a sidebar entre recolhida e expandida
+    const handleToggleMenu = () => {
+        document.body.classList.toggle('sidebar-collapsed');
+    };
+
+    // --- EVENT LISTENERS PARA A INTERFACE ---
+
+    // Abre o modal para CRIAR uma nova tarefa
+    if (createBtn) {
+        createBtn.addEventListener('click', () => {
+            // Dispara um evento customizado para que o dashboard.js saiba que deve preparar o formulário para CRIAÇÃO
+            document.dispatchEvent(new CustomEvent('startCreateTask'));
+            openModal();
         });
-    });
+    }
+    
+    // Fecha o modal pelo botão 'x'
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+    
+    // Fecha o modal se clicar fora do conteúdo
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
 
+    // Recolhe/expande a sidebar
+    if (toggleMenuBtn) {
+        toggleMenuBtn.addEventListener('click', handleToggleMenu);
+    }
+    
+    // Expõe as funções de UI globalmente para que o dashboard.js possa usá-las (ex: para abrir o modal no modo de edição)
+    window.ui = { openModal, closeModal };
 });
