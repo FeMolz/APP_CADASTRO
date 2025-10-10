@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (token) {
-        // Se já existe um token, o usuário já está logado.
-        // Redireciona para o dashboard e para a execução do script.
         window.location.href = '/dashboard/';
         return; 
     }
@@ -11,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     const togglePasswordIcon = document.getElementById('togglePasswordIcon');
 
-    // Função de ver a senha (reutilizada)
     togglePasswordIcon.addEventListener('click', () => {
         const isPassword = passwordInput.getAttribute('type') === 'password';
         if (isPassword) {
@@ -26,30 +23,25 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    // 1. Selecionar os elementos dos inputs, não apenas os valores
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
 
-    // Pegar os valores
     const email = emailInput.value;
     const password = passwordInput.value;
     
-    // 2. Limpar bordas de erro de tentativas anteriores
     emailInput.classList.remove('input-error');
     passwordInput.classList.remove('input-error');
     showMessage('', '');
 
-    // Validação de campos vazios
     if (!email || !password) {
         showMessage('Por favor, preencha todos os campos.', 'error');
         
-        // 3. ADICIONADO: Aplica a classe de erro nas bordas
         emailInput.classList.add('input-error');
         passwordInput.classList.add('input-error');
         
         setTimeout(() => {
             showMessage('', '');
-            // 4. ADICIONADO: Remove a classe de erro das bordas
+
             emailInput.classList.remove('input-error');
             passwordInput.classList.remove('input-error');
         }, 3000);
@@ -73,32 +65,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/dashboard/';
             }, 1000);
         } else {
-            // Erro vindo da API (ex: senha incorreta)
+
             showMessage(data.message, 'error');
             
-            // 3. ADICIONADO: Aplica a classe de erro nas bordas
             emailInput.classList.add('input-error');
             passwordInput.classList.add('input-error');
 
             setTimeout(() => {
                 showMessage('', '');
-                // 4. ADICIONADO: Remove a classe de erro das bordas
+
                 emailInput.classList.remove('input-error');
                 passwordInput.classList.remove('input-error');
             }, 3000);
         }
 
     } catch (error) {
-        // Erro de conexão com o servidor
+
         showMessage('Falha na comunicação com o servidor.', 'error');
         
-        // 3. ADICIONADO: Aplica a classe de erro nas bordas
+
         emailInput.classList.add('input-error');
         passwordInput.classList.add('input-error');
 
         setTimeout(() => {
             showMessage('', '');
-            // 4. ADICIONADO: Remove a classe de erro das bordas
+
             emailInput.classList.remove('input-error');
             passwordInput.classList.remove('input-error');
         }, 3000);

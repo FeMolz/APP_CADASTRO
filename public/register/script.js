@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
     if (token) {
-        // Se já existe um token, o usuário já está logado.
-        // Redireciona para o dashboard e para a execução do script.
+
         window.location.href = '/dashboard/';
         return; 
     }
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageDiv = document.getElementById('message');
     const passwordStrengthDiv = document.getElementById('password-strength');
 
-    // Função para alternar a visibilidade da senha
     const togglePasswordVisibility = (input, icon) => {
         if (input.type === 'password') {
             input.type = 'text';
@@ -32,14 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         togglePasswordVisibility(passwordInput, document.getElementById('togglePasswordIcon'));
     });
 
-    // Só adiciona o listener se o campo de confirmação existir
     if (document.getElementById('toggleConfirmPasswordIcon') && confirmPasswordInput) {
         document.getElementById('toggleConfirmPasswordIcon').addEventListener('click', () => {
             togglePasswordVisibility(confirmPasswordInput, document.getElementById('toggleConfirmPasswordIcon'));
         });
     }
 
-    // Função para verificar a força da senha
     passwordInput.addEventListener('input', () => {
         const password = passwordInput.value;
         let score = 0;
@@ -85,15 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Função para mostrar mensagem temporária
     function showTempMessage(message, type) {
         messageDiv.textContent = message;
-        // Adiciona a classe de mensagem (ex: 'error' ou 'success' no #message)
         messageDiv.className = type; 
 
         setTimeout(() => {
-            // Limpa a mensagem de texto
             messageDiv.textContent = '';
             messageDiv.className = '';
-            
-            // ADICIONADO: Limpa as classes de erro/sucesso de TODOS os campos
+
             const allFormGroups = form.querySelectorAll('.form-group');
             allFormGroups.forEach(group => {
                 group.classList.remove('error', 'success');
@@ -211,9 +204,9 @@ if (isValid) {
         }, 1500);
 
     } catch (error) {
-        // Pega qualquer erro (seja de conexão ou da API) e exibe a mensagem
+
         showTempMessage(error.message, 'error');
-        // Opcional: Adiciona a borda vermelha em todos os campos em caso de erro do servidor
+
         inputs.forEach(input => {
             input.parentElement.closest('.form-group').classList.add('error');
         });

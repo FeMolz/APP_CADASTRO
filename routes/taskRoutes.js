@@ -23,7 +23,7 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
             title,
             description,
             user: req.user.id,
-            imageUrl: req.file ? req.file.path : '' // Salva a URL do Cloudinary se houver imagem
+            imageUrl: req.file ? req.file.path : ''
         });
         const task = await newTask.save();
         res.status(201).json(task);
@@ -38,7 +38,6 @@ router.delete('/:id', auth, async (req, res) => {
     try {
         let task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ msg: 'Tarefa não encontrada.' });
-        // Garante que o usuário só pode deletar sua própria tarefa
         if (task.user.toString() !== req.user.id) {
             return res.status(401).json({ msg: 'Não autorizado.' });
         }
@@ -49,7 +48,6 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
-// Adicione aqui as rotas PUT (editar) no futuro
 router.put('/:id', auth, upload.single('image'), async (req, res) => {
     const { title, description } = req.body;
     const taskId = req.params.id;
@@ -71,16 +69,16 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
         const updatedFields = {};
         if (title) updatedFields.title = title;
         if (description) updatedFields.description = description;
-        if (req.file) updatedFields.imageUrl = req.file.path; // Atualiza a imagem se uma nova for enviada
+        if (req.file) updatedFields.imageUrl = req.file.path; 
 
         // Atualiza a tarefa no banco de dados
         task = await Task.findByIdAndUpdate(
             taskId,
             { $set: updatedFields },
-            { new: true, runValidators: true } // 'new: true' retorna o documento atualizado
+            { new: true, runValidators: true } 
         );
 
-        res.json(task); // Retorna a tarefa atualizada
+        res.json(task); 
 
     } catch (err) {
         console.error(err.message);

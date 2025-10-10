@@ -1,10 +1,7 @@
-// public/dashboard/dashboard.js
-
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = '/login/'; return; }
 
-    // --- SELEÇÃO DE ELEMENTOS PARA LÓGICA DE DADOS ---
     const logoutBtn = document.querySelector('.config-icons-container .bi-person-circle');
     const sidebarItems = document.querySelectorAll('.sidebar .itens-sidebar');
     const taskForm = document.getElementById('task-form');
@@ -12,10 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('modal-title');
     const saveTaskBtn = document.getElementById('save-task-btn');
 
-    // --- VARIÁVEL DE ESTADO ---
     let editingTaskId = null;
-
-    // --- FUNÇÕES DE DADOS (TAREFAS CRUD) ---
 
     const fetchAndRenderTasks = async () => {
         try {
@@ -62,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(url, { method, headers: { 'Authorization': `Bearer ${token}` }, body: formData });
             if (!res.ok) throw new Error(`Falha ao ${isEditing ? 'atualizar' : 'salvar'} a tarefa`);
             
-            window.ui.closeModal(); // Usa a função do outro script para fechar o modal
+            window.ui.closeModal();
             await fetchAndRenderTasks();
         } catch (error) { console.error(error); }
     };
@@ -125,18 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'inbox':
                     fetchAndRenderTasks();
                     break;
-                // ... outros cases
+                
                 default:
                     renderPlaceholder(filterText);
             }
         });
     });
 
-    // Ouve o evento do dashStyle.js para limpar o estado de edição
     document.addEventListener('startCreateTask', () => {
         editingTaskId = null;
     });
 
-    // --- INICIALIZAÇÃO ---
     fetchAndRenderTasks();
 });
