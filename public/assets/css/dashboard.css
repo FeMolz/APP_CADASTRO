@@ -251,6 +251,38 @@ aside {
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
 }
 
+/* Forçar altura fixa maior e permitir que apenas a descrição seja rolável */
+#task-modal .modal-content {
+  height: 680px; /* altura fixa maior solicitada */
+  display: flex;
+  flex-direction: column;
+}
+
+#task-modal form {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* ocupa toda a altura do modal-content */
+}
+
+/* Grupos que não devem crescer */
+#task-modal .form-group:not(.form-group--description) {
+  flex: 0 0 auto;
+}
+
+/* Grupo da descrição ocupa o espaço restante: aplicamos diretamente ao textarea */
+
+#task-modal .form-group textarea#task-description {
+  flex: 1 1 auto;
+  min-height: 320px; /* aumentado conforme solicitado */
+  max-height: 100%;
+  overflow: auto;
+  resize: none; /* impede expansão pelo usuário */
+}
+
+#task-modal .modal-footer {
+  flex: 0 0 auto; /* garante que o footer fique fixo embaixo */
+}
+
 #task-modal .modal-header h2 {
   font-size: 1.25rem;
   color: #1a73e8;

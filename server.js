@@ -1,14 +1,11 @@
 // server.js
 const express = require('express');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const cors = require('cors');
 const path = require('path');
-
-// Carrega as variáveis de ambiente do arquivo .env
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
