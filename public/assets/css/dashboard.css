@@ -15,10 +15,9 @@ body {
     "header header"
     "aside main";
   min-height: 100vh;
-}
+} 
 
 header { grid-area: header; }
-aside { grid-area: aside; }
 main { grid-area: main; }
 
 .navbar {
@@ -146,6 +145,7 @@ main { grid-area: main; }
 }
 
 aside {
+  grid-area: aside;
   width: 240px;
   background-color: rgb(240, 240, 240);
   border-right: 1px solid rgba(0, 0, 0, 0.05);
@@ -281,6 +281,7 @@ aside {
   border: 1px solid #dcdcdc;
   border-radius: 8px;
   font-size: 0.95rem;
+  resize: none;
 }
 
 #task-modal .modal-footer {
