@@ -65,13 +65,19 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
             return res.status(401).json({ msg: 'Não autorizado.' });
         }
 
-        // Monta o objeto com os campos atualizados
         const updatedFields = {};
-        if (title) updatedFields.title = title;
-        if (description) updatedFields.description = description;
-        if (req.file) updatedFields.imageUrl = req.file.path; 
 
-        // Atualiza a tarefa no banco de dados
+        if ('title' in req.body) {
+            updatedFields.title = title;
+        }
+
+        if ('description' in req.body) {
+            updatedFields.description = description;
+        }
+        if (req.file) {
+            updatedFields.imageUrl = req.file.path;
+        }
+
         task = await Task.findByIdAndUpdate(
             taskId,
             { $set: updatedFields },
