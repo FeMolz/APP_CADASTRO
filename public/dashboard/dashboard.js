@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error(`Falha ao ${isEditing ? 'atualizar' : 'salvar'} a tarefa`);
             
             window.ui.closeModal();
+            taskForm.reset();
             await fetchAndRenderTasks();
         } catch (error) { console.error(error); }
     };
