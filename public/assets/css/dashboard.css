@@ -242,42 +242,6 @@ aside {
   background-color: rgba(16, 24, 40, 0.6);
 }
 
-#task-modal .modal-content {
-  background-color: #ffffff;
-  padding: 22px;
-  border-radius: 10px;
-  width: 92%;
-  max-width: 520px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-
-#task-modal .modal-content {
-  height: 680px;
-  display: flex;
-  flex-direction: column;
-}
-
-#task-modal form {
-  display: flex;
-  flex-direction: column;
-  flex: 1; 
-}
-
-
-#task-modal .form-group:not(.form-group--description) {
-  flex: 0 0 auto;
-}
-
-
-
-#task-modal .form-group textarea#task-description {
-  flex: 1 1 auto;
-  min-height: 320px; 
-  max-height: 100%;
-  overflow: auto;
-  resize: none; 
-}
-
 #task-modal .modal-footer {
   flex: 0 0 auto; 
 }
@@ -420,6 +384,29 @@ aside {
     transform: scale(1.1);
 }
 
+.task-card .task-description-content p {
+    margin: 0;
+}
+
+.task-card .task-description-content {
+    padding: 25px; 
+    border: 1px solid #f0f2f5; 
+    border-radius: 5px;
+    background-color: #f8f9fa; 
+    margin-top: 10px;
+    max-height: 250px;  
+    overflow-y: auto; 
+}
+
+.task-card .task-description-content p {
+    margin: 0;
+    margin-bottom: 0.5em; 
+}
+
+.task-card .task-description-content p:last-child {
+    margin-bottom: 0;
+}
+
 /* ===== NOVO: ESTILOS DO MODAL DE VISUALIZAÇÃO ===== */
 #view-task-modal .modal-content {
     max-width: 700px;
@@ -464,3 +451,4 @@ aside {
     object-fit: contain; 
     border-radius: 8px;
 }
+

@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    tinymce.init({
+    selector: '#task-description',
+    plugins: 'lists',
+    menubar: false,
+    toolbar: 'undo redo | bold italic | fontsizeselect forecolor | alignleft aligncenter alignright alignjustify | bullist numlist indent outdent',
+    height: 300,
+    content_style: 'body { font-family:Poppins,sans-serif; font-size:14px }'
+});
+
     // 1. VERIFICAÇÃO DE AUTENTICAÇÃO
     const token = localStorage.getItem('token');
     if (!token) {
@@ -34,13 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeFormModal = () => {
         formModal.classList.add('hidden');
         taskForm.reset();
+        tinymce.get('task-description').setContent('');
         editingTaskId = null;
     };
 
     const openViewModal = (task) => {
         if (!task) return;
         viewTaskTitle.textContent = task.title;
-        viewTaskDescription.textContent = task.description || 'Nenhuma descrição fornecida.';
+        viewTaskDescription.innerHTML = task.description || 'Nenhuma descrição fornecida.';
         viewTaskImageContainer.innerHTML = '';
         if (task.imageUrl) {
             const img = document.createElement('img');
@@ -66,26 +76,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
                 taskCard.setAttribute('data-id', task._id);
-                taskCard.innerHTML = `
-                    <h3>${task.title}</h3>
-                    <p>${task.description || ''}</p>
-                    ${task.imageUrl ? `<img src="${task.imageUrl}" alt="${task.title}">` : ''}
-                    <div class="task-card-actions">
-                        <button class="edit-btn" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                        <button class="delete-btn" title="Apagar"><i class="bi bi-trash3-fill"></i></button>
-                    </div>
-                `;
-                taskListContainer.appendChild(taskCard);
+                // CÓDIGO CORRIGIDO
+            taskCard.innerHTML = `
+                <h3>${task.title}</h3>
+                <div class="task-description-content">${task.description || ''}</div>
+                ${task.imageUrl ? `<img src="${task.imageUrl}" alt="${task.title}">` : ''}
+                <div class="task-card-actions">
+                    <button class="edit-btn" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                    <button class="delete-btn" title="Apagar"><i class="bi bi-trash3-fill"></i></button>
+                </div>
+            `;
+            taskListContainer.appendChild(taskCard);
             });
         } catch (error) { console.error(error); }
     };
 
     const handleTaskFormSubmit = async (e) => {
         e.preventDefault();
+        const descriptionContent = tinymce.get('task-description').getContent();
+
         const formData = new FormData(taskForm);
+        formData.set('description', descriptionContent);
+
         const isEditing = editingTaskId !== null;
         const url = isEditing ? `/api/tasks/${editingTaskId}` : '/api/tasks';
         const method = isEditing ? 'PUT' : 'POST';
+
         try {
             const res = await fetch(url, { method, headers: { 'Authorization': `Bearer ${token}` }, body: formData });
             if (!res.ok) throw new Error(`Falha ao ${isEditing ? 'atualizar' : 'salvar'} a tarefa`);
@@ -106,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!taskToEdit) return;
             taskForm.reset();
             document.getElementById('task-title').value = taskToEdit.title;
-            document.getElementById('task-description').value = taskToEdit.description || '';
+            tinymce.get('task-description').setContent(taskToEdit.description || '');
             modalTitle.textContent = 'Editar Tarefa';
             saveTaskBtn.textContent = 'Atualizar Tarefa';
             openFormModal();

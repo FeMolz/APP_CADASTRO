@@ -1,9 +1,29 @@
 // routes/taskRoutes.js
+const sanitizeHtml = require('sanitize-html');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const upload = require('../config/cloudinaryConfig');
 const Task = require('../models/Task');
+
+const cleanHtml = (dirty) => sanitizeHtml(dirty, {
+    allowedTags: ['p', 'strong', 'em', 'u', 'span', 'br','ul', 'ol', 'li', 'blockquote'],
+
+    allowedAttributes: {
+        'span': ['style'],
+        'p': ['style']   
+    },
+
+    allowedStyles: {
+        'span': {
+            'color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/],
+            'font-size': [/^\d+p(x|t)$/],
+        },
+        'p': {
+            'text-align': [/^left$/, /^center$/, /^right$/, /^justify$/] 
+        }
+    }
+});
 
 // GET /api/tasks - Pega todas as tarefas do usuário logado
 router.get('/', auth, async (req, res) => {
@@ -21,7 +41,7 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
     try {
         const newTask = new Task({
             title,
-            description,
+            description: description ? cleanHtml(description) : '',
             user: req.user.id,
             imageUrl: req.file ? req.file.path : ''
         });
@@ -66,17 +86,11 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
         }
 
         const updatedFields = {};
-
-        if ('title' in req.body) {
-            updatedFields.title = title;
-        }
-
+        if ('title' in req.body) { updatedFields.title = title; }
         if ('description' in req.body) {
-            updatedFields.description = description;
+        updatedFields.description = description ? cleanHtml(description) : ''; // Sanitiza a descrição
         }
-        if (req.file) {
-            updatedFields.imageUrl = req.file.path;
-        }
+        if (req.file) { updatedFields.imageUrl = req.file.path; }
 
         task = await Task.findByIdAndUpdate(
             taskId,
