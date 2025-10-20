@@ -25,6 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Helper que adiciona Authorization e trata 401 globalmente
+    const apiFetch = async (url, opts = {}) => {
+        opts.headers = opts.headers || {};
+        opts.headers['Authorization'] = `Bearer ${token}`;
+        const res = await fetch(url, opts);
+        if (res.status === 401) {
+            // sessão expirada/inválida
+            localStorage.removeItem('token');
+            alert('Sessão expirada. Você será redirecionado para o login.');
+            window.location.href = '/login/';
+            throw new Error('Unauthorized');
+        }
+        return res;
+    };
+
     // 2. SELEÇÃO DE TODOS OS ELEMENTOS DA PÁGINA
     const createBtn = document.querySelector('.btn-create-container');
     const toggleMenuBtn = document.querySelector('.toggle-menu-container');
@@ -81,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchAndRenderTasks = async () => {
         try {
-            const res = await fetch('/api/tasks', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await apiFetch('/api/tasks');
             if (!res.ok) throw new Error('Falha ao carregar tarefas');
             allTasks = await res.json();
             taskListContainer.innerHTML = '';
@@ -105,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             taskListContainer.appendChild(taskCard);
             });
-        } catch (error) { console.error(error); }
+        } catch (error) { console.error(error); alert(error.message || 'Erro ao salvar tarefa'); }
     };
 
     const handleTaskFormSubmit = async (e) => {
@@ -132,8 +147,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const method = isEditing ? 'PUT' : 'POST';
 
         try {
-            const res = await fetch(url, { method, headers: { 'Authorization': `Bearer ${token}` }, body: formData });
-            if (!res.ok) throw new Error(`Falha ao ${isEditing ? 'atualizar' : 'salvar'} a tarefa`);
+            if (!token) throw new Error('Token de autenticação ausente. Faça login novamente.');
+            const res = await apiFetch(url, { method, body: formData });
+
+            // tenta ler resposta JSON ou texto para exibir mensagem útil
+            let bodyText = '';
+            try {
+                bodyText = await res.text();
+                try { bodyText = JSON.parse(bodyText); } catch(_){}
+            } catch (err) { /* ignore */ }
+
+            if (!res.ok) {
+                const serverMsg = (bodyText && bodyText.message) ? bodyText.message : (typeof bodyText === 'string' ? bodyText : JSON.stringify(bodyText));
+                console.error('Erro ao salvar tarefa', res.status, serverMsg);
+                throw new Error(serverMsg || `Falha ao ${isEditing ? 'atualizar' : 'salvar'} a tarefa (status ${res.status})`);
+            }
+
             closeFormModal();
             await fetchAndRenderTasks();
         } catch (error) { console.error(error); }
@@ -169,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(initEditorIfNeeded, 50);
         } else if (deleteBtn) {
             if (confirm('Tem certeza que deseja apagar esta tarefa?')) {
-                fetch(`/api/tasks/${taskId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+                apiFetch(`/api/tasks/${taskId}`, { method: 'DELETE' })
                     .then(res => {
                         if (!res.ok) throw new Error('Falha ao deletar a tarefa');
                         fetchAndRenderTasks();
