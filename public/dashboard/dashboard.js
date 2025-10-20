@@ -1,12 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    tinymce.init({
-    selector: '#task-description',
-    plugins: 'lists',
-    menubar: false,
-    toolbar: 'undo redo | bold italic | fontsizeselect forecolor | alignleft aligncenter alignright alignjustify | bullist numlist indent outdent',
-    height: 300,
-    content_style: 'body { font-family:Poppins,sans-serif; font-size:14px }'
-});
+    // TinyMCE: inicializar apenas quando o modal ficar visível
+    const initEditorIfNeeded = () => {
+        if (typeof tinymce === 'undefined' || !tinymce || typeof tinymce.init !== 'function') return;
+        try {
+            // se já existe um editor para esse id, não inicializa novamente
+            if (tinymce.get('task-description')) return;
+            tinymce.init({
+                selector: '#task-description',
+                plugins: 'lists',
+                menubar: false,
+                toolbar: 'undo redo | bold italic | fontsizeselect forecolor | alignleft aligncenter alignright alignjustify | bullist numlist indent outdent',
+                height: 300,
+                content_style: 'body { font-family:Poppins,sans-serif; font-size:14px }'
+            });
+        } catch (err) {
+            console.warn('TinyMCE init failed:', err);
+        }
+    };
 
     // 1. VERIFICAÇÃO DE AUTENTICAÇÃO
     const token = localStorage.getItem('token');
@@ -43,7 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeFormModal = () => {
         formModal.classList.add('hidden');
         taskForm.reset();
-        tinymce.get('task-description').setContent('');
+        try {
+            if (typeof tinymce !== 'undefined' && tinymce && tinymce.get && tinymce.get('task-description')) {
+                tinymce.get('task-description').setContent('');
+            } else {
+                const ta = document.getElementById('task-description');
+                if (ta) ta.value = '';
+            }
+        } catch (err) { console.warn('Erro limpando editor:', err); }
         editingTaskId = null;
     };
 
@@ -93,7 +110,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleTaskFormSubmit = async (e) => {
         e.preventDefault();
-        const descriptionContent = tinymce.get('task-description').getContent();
+        let descriptionContent = '';
+        try {
+            if (typeof tinymce !== 'undefined' && tinymce && tinymce.get && tinymce.get('task-description')) {
+                descriptionContent = tinymce.get('task-description').getContent();
+            } else {
+                const ta = document.getElementById('task-description');
+                descriptionContent = ta ? ta.value : '';
+            }
+        } catch (err) {
+            console.warn('Erro obtendo conteúdo do editor, fallback para textarea:', err);
+            const ta = document.getElementById('task-description');
+            descriptionContent = ta ? ta.value : '';
+        }
 
         const formData = new FormData(taskForm);
         formData.set('description', descriptionContent);
@@ -122,10 +151,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!taskToEdit) return;
             taskForm.reset();
             document.getElementById('task-title').value = taskToEdit.title;
-            tinymce.get('task-description').setContent(taskToEdit.description || '');
+            try {
+                if (typeof tinymce !== 'undefined' && tinymce && tinymce.get && tinymce.get('task-description')) {
+                    tinymce.get('task-description').setContent(taskToEdit.description || '');
+                } else {
+                    const ta = document.getElementById('task-description');
+                    if (ta) ta.value = taskToEdit.description || '';
+                }
+            } catch (err) {
+                console.warn('Erro ao setar conteúdo do editor:', err);
+                const ta = document.getElementById('task-description');
+                if (ta) ta.value = taskToEdit.description || '';
+            }
             modalTitle.textContent = 'Editar Tarefa';
             saveTaskBtn.textContent = 'Atualizar Tarefa';
             openFormModal();
+            setTimeout(initEditorIfNeeded, 50);
         } else if (deleteBtn) {
             if (confirm('Tem certeza que deseja apagar esta tarefa?')) {
                 fetch(`/api/tasks/${taskId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
@@ -152,6 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modalTitle.textContent = 'Nova Tarefa';
         saveTaskBtn.textContent = 'Salvar Tarefa';
         openFormModal();
+        // inicializa editor depois de abrir modal (TinyMCE não inicializa em elementos hidden)
+        setTimeout(initEditorIfNeeded, 50);
     });
 
     closeModalBtn.addEventListener('click', closeFormModal);
