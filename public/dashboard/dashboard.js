@@ -282,6 +282,17 @@ document.addEventListener('DOMContentLoaded', () => {
         taskForm.reset();
         modalTitle.textContent = 'Nova Tarefa';
         saveTaskBtn.textContent = 'Salvar Tarefa';
+
+        try {
+        if (tinymce.get('task-description')) {
+            tinymce.get('task-description').setContent('');
+        }
+    } catch (error) {
+        console.error("Erro ao limpar o editor TinyMCE:", error);
+        const textarea = document.getElementById('task-description');
+        if (textarea) textarea.value = '';
+    }
+
         openFormModal();
         setTimeout(initEditorIfNeeded, 50);
     });
