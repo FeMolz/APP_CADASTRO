@@ -1,10 +1,73 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // TinyMCE: inicializar apenas quando o modal ficar visível
-    const initEditorIfNeeded = () => {
-        if (typeof tinymce === 'undefined' || !tinymce || typeof tinymce.init !== 'function') return;
+    const loadScript = (src, timeout = 10000) => new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${src}"]`);
+        if (existing) {
+            existing.addEventListener('load', () => resolve());
+            existing.addEventListener('error', () => reject(new Error('Script failed to load')));
+            return;
+        }
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        let done = false;
+        const timer = setTimeout(() => {
+            if (!done) {
+                done = true;
+                s.remove();
+                reject(new Error('Script load timeout'));
+            }
+        }, timeout);
+        s.onload = () => { if (!done) { done = true; clearTimeout(timer); resolve(); } };
+        s.onerror = () => { if (!done) { done = true; clearTimeout(timer); reject(new Error('Script failed to load')); } };
+        document.head.appendChild(s);
+    });
+
+    const initEditorIfNeeded = async () => {
+    const CDN_URL = 'https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js';
+        if (typeof window !== 'undefined' && window.tinymce && window.tinymce.get) {
+            try { if (window.tinymce.get('task-description')) return; } catch(_){}
+        }
+
+        if (typeof window === 'undefined' || !window.tinymce) {
+            const maxAttempts = 3;
+            let ok = false;
+            for (let i = 0; i < maxAttempts; i++) {
+                try {
+                    console.info(`TinyMCE: loading attempt ${i+1}/${maxAttempts} from ${CDN_URL}`);
+                    await loadScript(CDN_URL, 12000);
+                    ok = true; break;
+                } catch (err) {
+                    console.warn(`TinyMCE load attempt ${i+1} failed:`, err);
+                    await new Promise(r => setTimeout(r, 300));
+                }
+            }
+            if (!ok) {
+                console.warn('TinyMCE script not available after retries. Falling back to textarea/editor-fallback.');
+                try {
+                    const ta = document.getElementById('task-description');
+                    if (ta && !document.getElementById('task-description-fallback')) {
+                        const fb = document.createElement('div');
+                        fb.id = 'task-description-fallback';
+                        fb.contentEditable = 'true';
+                        fb.className = 'editor-fallback';
+                        fb.style.minHeight = '200px';
+                        fb.style.border = '1px solid rgba(0,0,0,0.1)';
+                        fb.style.padding = '10px';
+                        fb.style.borderRadius = '8px';
+                        fb.style.background = 'rgba(255,255,255,0.03)';
+                        fb.style.overflowY = 'auto';
+                        ta.style.display = 'none';
+                        ta.parentNode.insertBefore(fb, ta.nextSibling);
+                        console.info('TinyMCE fallback editor created: #task-description-fallback');
+                    }
+                } catch (err) { console.warn('Erro criando fallback editor:', err); }
+                return;
+            }
+        }
+
         try {
-            // se já existe um editor para esse id, não inicializa novamente
-            if (tinymce.get('task-description')) return;
+            if (tinymce.get && tinymce.get('task-description')) return;
+            console.info('TinyMCE: initializing editor for #task-description');
             tinymce.init({
                 selector: '#task-description',
                 plugins: 'lists',
@@ -13,25 +76,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 height: 300,
                 content_style: 'body { font-family:Poppins,sans-serif; font-size:14px }'
             });
+            console.info('TinyMCE: init called');
         } catch (err) {
             console.warn('TinyMCE init failed:', err);
         }
     };
 
-    // 1. VERIFICAÇÃO DE AUTENTICAÇÃO
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = '/login/';
         return;
     }
 
-    // Helper que adiciona Authorization e trata 401 globalmente
     const apiFetch = async (url, opts = {}) => {
         opts.headers = opts.headers || {};
         opts.headers['Authorization'] = `Bearer ${token}`;
         const res = await fetch(url, opts);
         if (res.status === 401) {
-            // sessão expirada/inválida
             localStorage.removeItem('token');
             alert('Sessão expirada. Você será redirecionado para o login.');
             window.location.href = '/login/';
@@ -222,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         modalTitle.textContent = 'Nova Tarefa';
         saveTaskBtn.textContent = 'Salvar Tarefa';
         openFormModal();
-        // inicializa editor depois de abrir modal (TinyMCE não inicializa em elementos hidden)
         setTimeout(initEditorIfNeeded, 50);
     });
 
@@ -257,6 +317,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 6. INICIALIZAÇÃO
     fetchAndRenderTasks();
 });
